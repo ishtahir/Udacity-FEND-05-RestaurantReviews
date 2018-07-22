@@ -37,7 +37,7 @@ self.addEventListener('install', function(event) {
             ]);
         }).catch(function(err) {
             console.log('Caching failed', err);
-        }
+        })
     );
 });
 
