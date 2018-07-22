@@ -35,7 +35,9 @@ self.addEventListener('install', function(event) {
                 '/index.html',
                 '/restaurant.html'
             ]);
-        }).catch( err => console.log('caching failed', err))
+        }).catch(function(err) {
+            console.log('Caching failed', err);
+        }
     );
 });
 
