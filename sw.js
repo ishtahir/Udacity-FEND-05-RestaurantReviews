@@ -1,8 +1,8 @@
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
-        navigator.serviceWorker.register('js/sw.js').then(function(registration) {
+        navigator.serviceWorker.register('sw.js').then(function(registration) {
             // Registration was successful
-            console.log('ServiceWorker registration successful with scope: ', registration.scope, 'IT');
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
         }, function(err) {
             // registration failed :(
             console.log('ServiceWorker registration failed: ', err);
@@ -14,7 +14,7 @@ if ('serviceWorker' in navigator) {
 
 self.addEventListener('install', function(event) {
     event.waitUntil(
-        caches.open('restaurant-reviews-static-v1').then(function(cache) {
+        caches.open('restaurant-static-v1').then(function(cache) {
             return cache.addAll([
                 '/',
                 '/css/styles.css',
