@@ -2,48 +2,66 @@ if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
         navigator.serviceWorker.register('js/sw.js').then(function(registration) {
             // Registration was successful
-            console.log('ServiceWorker registration successful with scope: ', registration.scope);
-    }, function(err) {
+            console.log('ServiceWorker registration successful with scope: ', registration.scope, 'IT');
+        }, function(err) {
             // registration failed :(
             console.log('ServiceWorker registration failed: ', err);
         });
     });
+} else {
+    console.log('Service Worker is not supported in your browser.');
 }
 
 self.addEventListener('install', function(event) {
-    // Perform install steps
-    var CACHE_NAME = 'restaurant-reviews-cache-v1';
-    var urlsToCache = [
-      '/',
-      '/css/styles.css',
-      '/js/dbhelper.js',
-      '/js/main.js',
-      '/js/restaurant_info.js',
-      '/restaurant.html'
-    ];
-
-self.addEventListener('install', function(event) {
-    // Perform install steps
     event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then(function(cache) {
-                console.log('Opened cache');
-                return cache.addAll(urlsToCache);
-            })
-        );
-    });
+        caches.open('restaurant-reviews-static-v1').then(function(cache) {
+            return cache.addAll([
+                '/',
+                '/css/styles.css',
+                '/data/restaurants.json',
+                '/img/1.jpg',
+                '/img/2.jpg',
+                '/img/3.jpg',
+                '/img/4.jpg',
+                '/img/5.jpg',
+                '/img/6.jpg',
+                '/img/7.jpg',
+                '/img/8.jpg',
+                '/img/9.jpg',
+                '/img/10.jpg',
+                '/js/dbhelper.js',
+                '/js/main.js',
+                '/js/restaurant_info.js',
+                '/index.html',
+                '/restaurant.html'
+            ]);
+        }).catch( err => console.log('caching failed', err))
+    );
+});
+
+self.addEventListener('activate', function(event) {
+    event.waitUntil(
+        caches.keys().then(function(cacheNames) {
+            return Promise.all(
+                cacheNames.filter(function(cacheName) {
+                    return cacheName.startsWith('restaurant-reviews-')
+                }).map(function(cacheName) {
+                    return caches.delete(cacheName);
+                })
+            );
+        })
+    );
 });
 
 self.addEventListener('fetch', function(event) {
     event.respondWith(
-        caches.match(event.request)
-            .then(function(response) {
-                // Cache hit - return response
-                if (response) {
+        caches.open('restaurant-reviews-dynamic').then(function(cache) {
+            return cache.match(event.request).then(function (response) {
+                return response || fetch(event.request).then(function(response) {
+                    cache.put(event.request, response.clone());
                     return response;
-                }
-                return fetch(event.request);
-            }
-        )
+                });
+            });
+        })
     );
 });
